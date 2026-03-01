@@ -91,6 +91,32 @@ npm run preview
 - 브라우저 강력 새로고침 (`Ctrl + F5`)
 - GPU 가속 비활성 환경인지 확인
 
+## Deployment
+
+### Frontend (GitHub Pages)
+
+이 저장소에는 GitHub Pages 배포 워크플로우가 포함되어 있습니다.
+
+- workflow: `.github/workflows/deploy-pages.yml`
+- 배포 트리거: `main` 브랜치 push
+
+레포 `Settings > Secrets and variables > Actions` 에 아래 Secret을 설정하세요:
+
+- `VITE_API_BASE_URL`: 백엔드 배포 URL (예: `https://devdna-backend.onrender.com`)
+- `VITE_OWNER_GITHUB_URL`: 버튼으로 열 GitHub URL
+- `VITE_CONTACT_EMAIL`: 문의 메일 주소
+
+또한 `Settings > Pages`에서 `Build and deployment`를 `GitHub Actions`로 설정해야 합니다.
+
+### Backend (Render)
+
+루트의 `render.yaml`을 사용해 Render Blueprint로 배포할 수 있습니다.
+
+필수 환경변수:
+
+- `GITHUB_TOKEN`
+- `ALLOWED_ORIGINS` (예: GitHub Pages 도메인)
+
 ## Scripts
 
 - `npm run dev`: 개발 서버 실행

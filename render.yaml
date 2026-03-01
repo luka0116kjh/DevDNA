@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: devdna-backend
+    env: python
+    rootDir: backend
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: USE_MOCK_DATA
+        value: "false"
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: FLASK_DEBUG
+        value: "false"
