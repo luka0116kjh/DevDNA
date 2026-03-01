@@ -1,0 +1,108 @@
+﻿[
+    {
+        "filePath":"D:\\?꾨줈洹몃옒諛?\DevDNA\\frontend\\eslint.config.js",
+        "messages": [],
+        "suppressedMessages": [],
+        "errorCount": 0,
+        "fatalErrorCount": 0,
+        "warningCount": 0,
+        "fixableErrorCount": 0,
+        "fixableWarningCount": 0,
+        "usedDeprecatedRules": []
+    },
+    {
+        "filePath":"D:\\?꾨줈洹몃옒諛?\DevDNA\\frontend\\src\\App.jsx",
+        "messages": [
+            {
+                "ruleId": "no-unused-vars",
+                "severity": 2,
+                "message": "'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u.",
+                "line": 4,
+                "column": 10,
+                "nodeType": "Identifier",
+                "messageId": "unusedVar",
+                "endLine": 4,
+                "endColumn": 16,
+                "suggestions": [
+                    {
+                        "messageId": "removeVar",
+                        "data": {
+                            "varName": "motion"
+                        },
+                        "fix": {
+                            "range": [
+                                195,
+                                202
+                            ],
+                            "text": ""
+                        },
+                        "desc": "Remove unused variable 'motion'."
+                    }
+                ]
+            },
+            {
+                "ruleId": "react-hooks/exhaustive-deps",
+                "severity": 1,
+                "message": "React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array.",
+                "line": 26,
+                "column": 6,
+                "nodeType": "ArrayExpression",
+                "endLine": 26,
+                "endColumn": 12,
+                "suggestions": [
+                    {
+                        "desc": "Update the dependencies array to be: [fetchData, user]",
+                        "fix": {
+                            "range": [
+                                879,
+                                885
+                            ],
+                            "text": "[fetchData, user]"
+                        }
+                    }
+                ]
+            }
+        ],
+        "suppressedMessages": [],
+        "errorCount": 1,
+        "fatalErrorCount": 0,
+        "warningCount": 1,
+        "fixableErrorCount": 0,
+        "fixableWarningCount": 0,
+        "source": "import React, { useState, useEffect, useRef } from 'react';\nimport { BrowserRouter as Router, Routes, Route, useNavigate, useParams } from 'react-router-dom';\nimport axios from 'axios';\nimport { motion, AnimatePresence } from 'framer-motion';\nimport { Github, Download, Twitter, Share2, Activity } from 'lucide-react';\nimport * as htmlToImage from 'html-to-image';\nimport Grass3D from './components/Grass3D';\nimport './index.css';\n\nfunction MainApp() {\n  const [username, setUsername] = useState('');\n  const [loading, setLoading] = useState(false);\n  const [data, setData] = useState(null);\n  const [error, setError] = useState('');\n\n  const navigate = useNavigate();\n  const { user } = useParams();\n  const cardRef = useRef(null);\n\n  // If URL has user param, load it automatically\n  useEffect(() => {\n    if (user) {\n      setUsername(user);\n      fetchData(user);\n    }\n  }, [user]);\n\n  const fetchData = async (targetUser) => {\n    if (!targetUser) return;\n\n    setLoading(true);\n    setError('');\n    setData(null);\n\n    try {\n      const response = await axios.get(`http://localhost:5000/api/analyze/${targetUser}`);\n      setData(response.data);\n      // Update URL without full reload\n      if (user !== targetUser) {\n        navigate(`/user/${targetUser}`, { replace: true });\n      }\n    } catch (err) {\n      setError(err.response?.data?.error || 'Failed to fetch data');\n    } finally {\n      setLoading(false);\n    }\n  };\n\n  const handleSearch = (e) => {\n    e.preventDefault();\n    if (username.trim()) {\n      fetchData(username.trim());\n    }\n  };\n\n  const handleDownload = () => {\n    if (cardRef.current) {\n      const filter = (node) => {\n        // Exclude the actions div so buttons aren't on the image\n        return !node.classList?.contains('actions');\n      };\n\n      htmlToImage.toPng(cardRef.current, { backgroundColor: '#050505', cacheBust: true, filter })\n        .then((dataUrl) => {\n          const link = document.createElement('a');\n          link.download = `${username}-devdna.png`;\n          link.href = dataUrl;\n          link.click();\n        })\n        .catch((err) => {\n          console.error('oops, something went wrong!', err);\n        });\n    }\n  };\n\n  const handleTwitterShare = () => {\n    if (!data) return;\n    const text = `I'm a ${data.type}! ?㎚%0A%0A?꾨왂?? ${data.scores['?꾨왂??]}%0A?쇨??? ${data.scores['?쇨???]}%0A吏묒쨷?? ${data.scores['吏묒쨷 ??컻??]}%0A?쇳뻾?? ${data.scores['?쇳뻾??吏??]}%0A%0ACheck out your DevDNA: http://devdna.site/user/${username}`;\n    window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');\n  };\n\n  const handleCopyLink = () => {\n    navigator.clipboard.writeText(`http://devdna.site/user/${username}`);\n    alert('Link copied to clipboard!');\n  };\n\n  return (\n    <div className=\"app-container\">\n      {/* 3D Background */}\n      <Grass3D data={data} />\n\n      {/* Content Layer */}\n      <div className=\"content-layer\">\n\n        <div className=\"header glow-hover\">\n          <div className=\"logo\" onClick={() => { navigate('/'); setData(null); setUsername(''); }}>\n            <Activity className=\"logo-icon\" size={32} />\n            <span>DevDNA</span>\n          </div>\n        </div>\n\n        <motion.form\n          initial={{ y: -50, opacity: 0 }}\n          animate={{ y: data ? -200 : 0, opacity: 1 }}\n          transition={{ duration: 0.8, ease: \"easeOut\" }}\n          className=\"search-form\"\n          onSubmit={handleSearch}\n        >\n          <div className=\"input-wrapper\">\n            <Github className=\"github-icon\" size={24} />\n            <input\n              type=\"text\"\n              className=\"username-input\"\n              placeholder=\"Enter GitHub ID (e.g., luka0116kjh)\"\n              value={username}\n              onChange={(e) => setUsername(e.target.value)}\n              disabled={loading}\n            />\n          </div>\n          {!data && (\n            <button type=\"submit\" className=\"btn-primary glow-hover\" disabled={loading || !username}>\n              Analyze My DNA\n            </button>\n          )}\n        </motion.form>\n\n        {loading && (\n          <div className=\"loader-container\">\n            <div className=\"spinner\"></div>\n            <span className=\"loading-text\">SEQUENCING REPOSITORY DATA...</span>\n          </div>\n        )}\n\n        {error && (\n          <motion.div\n            initial={{ opacity: 0 }}\n            animate={{ opacity: 1 }}\n            className=\"glass-panel\"\n            style={{ padding: '1rem', color: '#ff3366', marginTop: '1rem', borderColor: '#ff3366' }}\n          >\n            {error}\n          </motion.div>\n        )}\n\n        <AnimatePresence>\n          {data && !loading && (\n            <motion.div\n              ref={cardRef}\n              initial={{ y: 100, opacity: 0, scale: 0.9 }}\n              animate={{ y: 0, opacity: 1, scale: 1 }}\n              exit={{ y: 50, opacity: 0 }}\n              transition={{ duration: 0.6, type: \"spring\", bounce: 0.4 }}\n              className=\"result-card glass-panel\"\n            >\n              <div className=\"user-profile\">\n                <img src={`https://github.com/${username}.png`} alt={username} className=\"avatar glow-hover\" />\n                <div className=\"user-info\">\n                  <h2 className=\"neon-text\">{username}</h2>\n                  <p>{data.totalContributions} Contributions in the last year</p>\n                </div>\n              </div>\n\n              <div className=\"dna-type glow-hover\">\n                <p>{data.type}</p>\n              </div>\n\n              <div className=\"dna-stats\">\n                {Object.entries(data.scores).map(([label, score]) => (\n                  <div className=\"stat-row\" key={label}>\n                    <span className=\"stat-label\">{label}</span>\n                    <div className=\"stat-bar-container\">\n                      <motion.div\n                        initial={{ width: 0 }}\n                        animate={{ width: `${score}%` }}\n                        transition={{ duration: 1.5, delay: 0.5, ease: \"easeOut\" }}\n                        className=\"stat-bar\"\n                      />\n                    </div>\n                    <span className=\"stat-value neon-text\">{score}</span>\n                  </div>\n                ))}\n              </div>\n\n              {/* These tools won't be in the downloaded image if we hide them or adjust html-to-image filter, but showing them is fine */}\n              <div className=\"actions\" data-html2canvas-ignore>\n                <button onClick={handleDownload} className=\"btn-secondary glow-hover\" title=\"Save Image\">\n                  <Download size={20} /> Image\n                </button>\n                <button onClick={handleTwitterShare} className=\"btn-secondary glow-hover\" title=\"Share on Twitter\">\n                  <Twitter size={20} /> Share\n                </button>\n                <button onClick={handleCopyLink} className=\"btn-secondary glow-hover\" title=\"Copy Link\">\n                  <Share2 size={20} /> Copy\n                </button>\n              </div>\n            </motion.div>\n          )}\n        </AnimatePresence>\n\n      </div>\n    </div>\n  );\n}\n\nfunction App() {\n  return (\n    <Router>\n      <Routes>\n        <Route path=\"/\" element={<MainApp />} />\n        <Route path=\"/user/:user\" element={<MainApp />} />\n      </Routes>\n    </Router>\n  );\n}\n\nexport default App;\n",
+        "usedDeprecatedRules": []
+    },
+    {
+        "filePath":"D:\\?꾨줈洹몃옒諛?\DevDNA\\frontend\\src\\components\\Grass3D.jsx",
+        "messages": [],
+        "suppressedMessages": [],
+        "errorCount": 0,
+        "fatalErrorCount": 0,
+        "warningCount": 0,
+        "fixableErrorCount": 0,
+        "fixableWarningCount": 0,
+        "usedDeprecatedRules": []
+    },
+    {
+        "filePath":"D:\\?꾨줈洹몃옒諛?\DevDNA\\frontend\\src\\main.jsx",
+        "messages": [],
+        "suppressedMessages": [],
+        "errorCount": 0,
+        "fatalErrorCount": 0,
+        "warningCount": 0,
+        "fixableErrorCount": 0,
+        "fixableWarningCount": 0,
+        "usedDeprecatedRules": []
+    },
+    {
+        "filePath":"D:\\?꾨줈洹몃옒諛?\DevDNA\\frontend\\vite.config.js",
+        "messages": [],
+        "suppressedMessages": [],
+        "errorCount": 0,
+        "fatalErrorCount": 0,
+        "warningCount": 0,
+        "fixableErrorCount": 0,
+        "fixableWarningCount": 0,
+        "usedDeprecatedRules": []
+    }
+]
