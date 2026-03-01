@@ -1,0 +1,9 @@
+PAGE LOG: [vite] connecting...
+PAGE LOG: [vite] connected.
+PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+PAGE ERROR: Cannot access 'fetchData' before initialization
+PAGE LOG: %s
+
+%s
+ An error occurred in the <MainApp> component. Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
