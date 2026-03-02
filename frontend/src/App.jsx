@@ -43,7 +43,7 @@ function MainApp() {
 
     try {
       const encodedUser = encodeURIComponent(normalizedUser);
-      const response = await axios.get(`${API_BASE_URL}/api/analyze/${encodedUser}`);
+      const response = await axios.get(`${API_BASE_URL}/api/analyze/${encodedUser}`); // 현재 API 경로에 맞게 수정해야 할 수 있습니다.
       setData(response.data);
       let routeUser = '';
       if (user) {
