@@ -75,13 +75,19 @@ $frontendProcess = Start-Process `
 Write-Host "Frontend PID: $($frontendProcess.Id)" -ForegroundColor DarkGray
 
 Write-Host "Waiting for services to initialize..." -ForegroundColor Cyan
-Start-Sleep -Seconds 3
+$maxRetries = 15
+$backendReady = $false
+$frontendReady = $false
 
-$backendReady = Test-PortOpen -port 5000
-$frontendReady = Test-PortOpen -port 5173
+for ($i = 0; $i -lt $maxRetries; $i++) {
+    Start-Sleep -Seconds 1
+    if (-not $backendReady) { $backendReady = Test-PortOpen -port 5000 }
+    if (-not $frontendReady) { $frontendReady = Test-PortOpen -port 5173 }
+    if ($backendReady -and $frontendReady) { break }
+}
 
 if (-not $backendReady -or -not $frontendReady) {
-    throw "One or more services failed to start. Check backend.err.log / frontend.err.log in project root."
+    throw "One or more services failed to start within the timeout. Check backend.err.log / frontend.err.log in project root."
 }
 
 Write-Host ""
