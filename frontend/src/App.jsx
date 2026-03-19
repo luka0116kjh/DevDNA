@@ -4,6 +4,7 @@ import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Github, Mail, Share2, Activity, LogOut } from 'lucide-react';
 import ContributionHeatmap2D from './components/ContributionHeatmap2D';
+import Grass3D from './components/Grass3D';
 import './index.css';
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
@@ -16,6 +17,7 @@ function MainApp() {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
+  const [is3D, setIs3D] = useState(false);
 
   const navigate = useNavigate();
   const { user } = useParams();
@@ -121,13 +123,14 @@ function MainApp() {
     navigate('/');
   };
 
-  const handle3DUpdateNotice = () => {
-    alert('3D view is currently being updated.');
-  };
 
   return (
     <div className="app-container">
-      <ContributionHeatmap2D data={data} />
+      {is3D ? (
+        <Grass3D data={data} />
+      ) : (
+        <ContributionHeatmap2D data={data} />
+      )}
 
       <div className="content-layer">
         <div className="header">
@@ -135,8 +138,12 @@ function MainApp() {
             <Activity className="logo-icon" size={32} />
             <span>DevDNA</span>
           </div>
-          <button type="button" className="view-update-btn glow-hover" onClick={handle3DUpdateNotice}>
-            3D (Updating)
+          <button
+            type="button"
+            className={`view-update-btn glow-hover ${is3D ? 'active' : ''}`}
+            onClick={() => setIs3D(!is3D)}
+          >
+            {is3D ? '2D View' : '3D View'}
           </button>
         </div>
 

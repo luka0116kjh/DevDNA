@@ -49,7 +49,7 @@ GitHub 사용자 이름을 기반으로 지난 1년간의 기여 데이터를 �
 
 1. **Environment Setup** (One-time):
    ```powershell
-   cd d:\DevDNA
+   cd d:\프로그래밍\DevDNA
    Copy-Item .\backend\.env.example .\backend\.env
    Copy-Item .\frontend\.env.example .\frontend\.env
    ```
